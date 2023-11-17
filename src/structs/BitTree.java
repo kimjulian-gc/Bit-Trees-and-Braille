@@ -117,6 +117,10 @@ public class BitTree {
       return ((BitTreeLeaf) currNode).value;
     }
 
+    if (currNode == null) {
+      throw new NoSuchElementException();
+    }
+
     // we have bits remaining
     char path = getPath(remainingBits);
 

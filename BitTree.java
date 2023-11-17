@@ -1,5 +1,9 @@
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.IllegalFormatException;
 import java.util.NoSuchElementException;
 
 class BitTree {
@@ -48,8 +52,17 @@ class BitTree {
   /**
    * reads a series of lines of the form bits,value and stores them in the tree.
    */
-  void load(InputStream source) {
+  void load(InputStream source) throws IOException, IllegalArgumentException {
+    BufferedReader in = new BufferedReader(new InputStreamReader(source));
 
+    for (String line = in.readLine(); line != null; line = in.readLine()) {
+      String[] toStore = line.split(",");
+      if (toStore.length != 2) {
+        throw new IOException("Encountered bad line while loading: got \"" + line
+            + "\", should be formatted in bits,value format");
+      }
+      this.set(toStore[0], toStore[1]);
+    }
   }
 
   class BitTreeNode {

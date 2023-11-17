@@ -1,5 +1,6 @@
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.NoSuchElementException;
 
 class BitTree {
   int bitLength;
@@ -18,10 +19,7 @@ class BitTree {
    * inappropriate length or contains values other than 0 or 1.
    */
   void set(String bits, String value) throws IllegalArgumentException {
-    if (bits.length() != this.bitLength) {
-      throw new IllegalArgumentException("Inappropriate length for bit string: should be length "
-          + this.bitLength + ", got " + bits.length());
-    }
+    checkBitString(bits);
 
     this.root = set(this.root, bits, value);
   }
@@ -40,11 +38,7 @@ class BitTree {
       toEdit = new BitTreeNode();
     }
 
-    char path = remainingBits.charAt(0);
-    if (path != '0' && path != '1') {
-      // bit string is invalid
-      throw new IllegalArgumentException("Bit string contains values other than 0 or 1: encountered " + path);
-    }
+    char path = getPath(remainingBits);
 
     // bit string is valid, path is valid. edit the node
     String newRemaining = remainingBits.substring(1);
@@ -52,7 +46,7 @@ class BitTree {
       // go left
       toEdit.left = set(toEdit.left, newRemaining, value);
     }
-    if (path == '1') {
+    else {
       // go right
       toEdit.right = set(toEdit.right, newRemaining, value);
     }
@@ -65,9 +59,36 @@ class BitTree {
    * follows the path through the tree given by bits, returning the value at the end. If there is no
    * such path, or if bits is the incorrect length, get should throw an exception.
    */
-  String get(String bits) {
-    // stub
-    return "";
+  String get(String bits) throws IllegalArgumentException {
+    checkBitString(bits);
+
+    try {
+      return get(this.root, bits);
+    } catch (NoSuchElementException e) {
+      throw new NoSuchElementException("Could not locate value at " + bits);
+    }
+  }
+
+  String get(BitTreeNode currNode, String remainingBits)
+      throws NoSuchElementException, IllegalArgumentException {
+    if (remainingBits.length() == 0) {
+      if (!(currNode instanceof BitTreeLeaf)) {
+        throw new NoSuchElementException();
+      }
+      return ((BitTreeLeaf) currNode).value;
+    }
+
+    // we have bits remaining
+    char path = getPath(remainingBits);
+    
+    // bit string is valid, path is valid.
+    String newRemaining = remainingBits.substring(1);
+    if (path == '0') {
+      // go left
+      return get(currNode.left, newRemaining);
+    }
+    // go right otherwise
+    return get(currNode.right, newRemaining);
   }
 
   /**
@@ -78,7 +99,8 @@ class BitTree {
   }
 
   void printNode(PrintWriter pen, BitTreeNode node, String currentBitString) {
-    if (node == null) return;
+    if (node == null)
+      return;
     if (node instanceof BitTreeLeaf) {
       pen.println(currentBitString + "," + ((BitTreeLeaf) node).value);
       return;
@@ -93,6 +115,23 @@ class BitTree {
    */
   void load(InputStream source) {
 
+  }
+
+  void checkBitString(String bits) throws IllegalArgumentException {
+    if (bits.length() != this.bitLength) {
+      throw new IllegalArgumentException("Inappropriate length for bit string: should be length "
+          + this.bitLength + ", got " + bits.length());
+    }
+  }
+
+  char getPath(String bits) throws IllegalArgumentException {
+    char path = bits.charAt(0);
+    if (path != '0' && path != '1') {
+      // bit string is invalid
+      throw new IllegalArgumentException(
+          "Bit string contains values other than 0 or 1: encountered " + path);
+    }
+    return path;
   }
 
   class BitTreeNode {

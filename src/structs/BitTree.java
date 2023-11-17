@@ -1,3 +1,4 @@
+package structs;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -5,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.NoSuchElementException;
 
-class BitTree {
+public class BitTree {
   int bitLength;
   BitTreeNode root;
 
@@ -21,7 +22,7 @@ class BitTree {
    * replaces the value at the end with value. set should throw an exception if bits is the
    * inappropriate length or contains values other than 0 or 1.
    */
-  void set(String bits, String value) throws IllegalArgumentException {
+  public void set(String bits, String value) throws IllegalArgumentException {
     checkBitString(bits);
 
     this.root = set(this.root, bits, value);
@@ -31,7 +32,7 @@ class BitTree {
    * follows the path through the tree given by bits, returning the value at the end. If there is no
    * such path, or if bits is the incorrect length, get should throw an exception.
    */
-  String get(String bits) throws IllegalArgumentException {
+  public String get(String bits) throws IllegalArgumentException {
     checkBitString(bits);
 
     try {
@@ -44,14 +45,14 @@ class BitTree {
   /**
    * prints out the contents of the tree in CSV format.
    */
-  void dump(PrintWriter pen) {
+  public void dump(PrintWriter pen) {
     printNode(pen, this.root, "");
   }
 
   /**
    * reads a series of lines of the form bits,value and stores them in the tree.
    */
-  void load(InputStream source) throws IOException, IllegalArgumentException {
+  public void load(InputStream source) throws IOException {
     BufferedReader in = new BufferedReader(new InputStreamReader(source));
 
     for (String line = in.readLine(); line != null; line = in.readLine()) {

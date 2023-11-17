@@ -24,6 +24,47 @@ class BitTree {
     this.root = set(this.root, bits, value);
   }
 
+  /**
+   * follows the path through the tree given by bits, returning the value at the end. If there is no
+   * such path, or if bits is the incorrect length, get should throw an exception.
+   */
+  String get(String bits) throws IllegalArgumentException {
+    checkBitString(bits);
+
+    try {
+      return get(this.root, bits);
+    } catch (NoSuchElementException e) {
+      throw new NoSuchElementException("Could not locate value at " + bits);
+    }
+  }
+
+  /**
+   * prints out the contents of the tree in CSV format.
+   */
+  void dump(PrintWriter pen) {
+    printNode(pen, this.root, "");
+  }
+
+  /**
+   * reads a series of lines of the form bits,value and stores them in the tree.
+   */
+  void load(InputStream source) {
+
+  }
+
+  class BitTreeNode {
+    BitTreeNode left;
+    BitTreeNode right;
+  }
+
+  class BitTreeLeaf extends BitTreeNode {
+    String value;
+
+    BitTreeLeaf(String value) {
+      this.value = value;
+    }
+  }
+
   BitTreeNode set(BitTreeNode currNode, String remainingBits, String value)
       throws IllegalArgumentException {
     if (remainingBits.length() == 0) {
@@ -45,28 +86,13 @@ class BitTree {
     if (path == '0') {
       // go left
       toEdit.left = set(toEdit.left, newRemaining, value);
-    }
-    else {
+    } else {
       // go right
       toEdit.right = set(toEdit.right, newRemaining, value);
     }
 
     // return edited node
     return toEdit;
-  }
-
-  /**
-   * follows the path through the tree given by bits, returning the value at the end. If there is no
-   * such path, or if bits is the incorrect length, get should throw an exception.
-   */
-  String get(String bits) throws IllegalArgumentException {
-    checkBitString(bits);
-
-    try {
-      return get(this.root, bits);
-    } catch (NoSuchElementException e) {
-      throw new NoSuchElementException("Could not locate value at " + bits);
-    }
   }
 
   String get(BitTreeNode currNode, String remainingBits)
@@ -80,7 +106,7 @@ class BitTree {
 
     // we have bits remaining
     char path = getPath(remainingBits);
-    
+
     // bit string is valid, path is valid.
     String newRemaining = remainingBits.substring(1);
     if (path == '0') {
@@ -89,32 +115,6 @@ class BitTree {
     }
     // go right otherwise
     return get(currNode.right, newRemaining);
-  }
-
-  /**
-   * prints out the contents of the tree in CSV format.
-   */
-  void dump(PrintWriter pen) {
-    printNode(pen, this.root, "");
-  }
-
-  void printNode(PrintWriter pen, BitTreeNode node, String currentBitString) {
-    if (node == null)
-      return;
-    if (node instanceof BitTreeLeaf) {
-      pen.println(currentBitString + "," + ((BitTreeLeaf) node).value);
-      return;
-    }
-
-    printNode(pen, node.left, currentBitString + "0");
-    printNode(pen, node.right, currentBitString + "1");
-  }
-
-  /**
-   * reads a series of lines of the form bits,value and stores them in the tree.
-   */
-  void load(InputStream source) {
-
   }
 
   void checkBitString(String bits) throws IllegalArgumentException {
@@ -134,16 +134,15 @@ class BitTree {
     return path;
   }
 
-  class BitTreeNode {
-    BitTreeNode left;
-    BitTreeNode right;
-  }
-
-  class BitTreeLeaf extends BitTreeNode {
-    String value;
-
-    BitTreeLeaf(String value) {
-      this.value = value;
+  void printNode(PrintWriter pen, BitTreeNode node, String currentBitString) {
+    if (node == null)
+      return;
+    if (node instanceof BitTreeLeaf) {
+      pen.println(currentBitString + "," + ((BitTreeLeaf) node).value);
+      return;
     }
+
+    printNode(pen, node.left, currentBitString + "0");
+    printNode(pen, node.right, currentBitString + "1");
   }
 }
